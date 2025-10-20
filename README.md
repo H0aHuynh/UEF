@@ -1,32 +1,50 @@
 # UEF
 
-# 1. Tạo script load kext
-sudo tee /Library/LaunchDaemons/com.apple.AppleHDA.load.plist > /dev/null << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
+<key>IOKitPersonalities</key>
 <dict>
-    <key>Label</key>
-    <string>com.apple.AppleHDA.load</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/usr/sbin/kextload</string>
-        <string>/Library/Extensions/AppleHDA.kext</string>
-    </array>
-    <key>RunAtLoad</key>
-    <true/>
-    <key>KeepAlive</key>
-    <false/>
+    <key>VoodooHDA</key>
+    <dict>
+        <key>IOClass</key>
+        <string>VoodooHDA</string>
+        <key>IOMatchCategory</key>
+        <string>audio</string>
+        <key>CFBundleIdentifier</key>
+        <string>org.voodoo.driver.VoodooHDA</string>
+        <key>IOProviderClass</key>
+        <string>AppleHDAController</string>
+        <key>HDAConfigDefault</key>
+        <array>
+            <dict>
+                <key>func-group</key>
+                <integer>1</integer>
+                <key>codec</key>
+                <data>EjkuZw==</data> <!-- Base64 of 0x10ec0897 -->
+                <key>layout</key>
+                <data>BRQ=</data> <!-- Base64 of 69 (layout ID 69) -->
+                <key>device</key>
+                <array>
+                    <dict>
+                        <key>node</key>
+                        <integer>0x14</integer> <!-- Speaker -->
+                        <key>codec</key>
+                        <data>EjkuZw==</data>
+                    </dict>
+                    <dict>
+                        <key>node</key>
+                        <integer>0x21</integer> <!-- Headphone -->
+                        <key>codec</key>
+                        <data>EjkuZw==</data>
+                    </dict>
+                </array>
+            </dict>
+        </array>
+        <key>Platforms</key>
+        <string>HDA</string>
+        <key>SampleRate</key>
+        <integer>44100</integer>
+        <key>BitDepth</key>
+        <integer>16</integer>
+        <key>InputGain</key>
+        <real>0.0</real>
+    </dict>
 </dict>
-</plist>
-EOF
-
-# 2. Fix quyền
-sudo chown root:wheel /Library/LaunchDaemons/com.apple.AppleHDA.load.plist
-sudo chmod 644 /Library/LaunchDaemons/com.apple.AppleHDA.load.plist
-
-# 3. Load daemon
-sudo launchctl load /Library/LaunchDaemons/com.apple.AppleHDA.load.plist
-
-# 4. Test
-sudo launchctl start com.apple.AppleHDA.load
